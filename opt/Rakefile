@@ -1,0 +1,62 @@
+# PhantomJS
+case RUBY_PLATFORM 
+when /darwin/
+  phantomjs = {
+    :bindir => "phantomjs/bin",
+    :target => "phantomjs/bin/phantomjs",
+    :url => "http://phantomjs.googlecode.com/files/phantomjs-1.1.0-macosx-universal.dmg",
+    :archive => "phantomjs/phantomjs-1.1.0-macosx-universal.dmg",
+    :app    => "phantomjs/phantomjs.app",
+    :volume  => "/Volumes/phantomjs",
+  }
+  
+  file phantomjs[:target] => [phantomjs[:app], File.dirname(phantomjs[:target])] do |t|
+    sh "(cd #{t.prerequisites[1]} && ln -s ../#{File.basename(t.prerequisites[0])}/Contents/MacOS/phantomjs phantomjs)"
+  end
+
+  directory File.dirname(phantomjs[:target])
+
+  file phantomjs[:app] => [phantomjs[:archive]] do |t|
+    sh "hdiutil attach #{t.prerequisites[0]}"
+    begin
+      sh "cp -R #{phantomjs[:volume]}/#{File.basename(t.name)} phantomjs"
+    ensure
+      sh "hdiutil detach #{phantomjs[:volume]}"
+    end
+  end
+  
+  file phantomjs[:archive] do |t|
+    sh "(cd phantomjs && curl -O #{phantomjs[:url]})"
+  end
+else
+  # http://code.google.com/p/phantomjs/downloads/list
+  # http://code.google.com/p/phantomjs/wiki/Installation
+  abort "Your RUBY_PLATFORM (#{RUBY_PLATFORM}) is not supported yet. See http://code.google.com/p/phantomjs/wiki/Installation and help us."
+end
+
+
+# Processing.js
+processingjs = {
+  :url => "http://processingjs.org/content/download/processing-js-1.1.0/processing-1.1.0.min.js",
+  :target => "../vendor/assets/javascripts/processing.min.js"
+}
+
+file processingjs[:target] => [File.dirname(processingjs[:target])] do |t|
+  sh "curl -o #{t.name} #{processingjs[:url]}"
+end
+
+directory File.dirname(processingjs[:target])
+
+
+# Install
+desc "install PhantomJS"
+task :install => [phantomjs[:target], processingjs[:target]]
+
+desc "remove all destination files"
+task :clean do |t|
+  victims = phantomjs.reject{|k,v| [:url, :volume].include?(k) }.values
+  sh "rm -Rf #{victims.join(" ")}"
+end
+
+task :default => :install
+

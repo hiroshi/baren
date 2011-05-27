@@ -1,21 +1,33 @@
 require "tilt"
 require "sprockets"
 module Baren
+  class ProcessingJs
+    def self.path
+      File.join(File.dirname(__FILE__), '..', 'vendor', 'assets', 'javascripts', 'processing.min.js')
+    end
+  end
+
+  class PhantomJs
+    def self.path
+      File.join(File.dirname(__FILE__), '..', 'opt', 'phantomjs', 'bin', 'phantomjs')
+    end
+
+    def self.pjs2png_path
+      File.join(File.dirname(__FILE__), '..', 'opt', 'phantomjs', 'pjs2png.js.erb')
+    end
+  end
+
   class PjsTemplate < Tilt::Template
     #self.default_mime_type = 'image/png'
-    
     def prepare
     end
-    
+
     def evaluate(scope, locals, &block)
-      phantomjs = "/Volumes/phantomjs/phantomjs.app/Contents/MacOS/phantomjs" # FIXME
       require "tempfile"
       dataURL = Tempfile.open("pjs2png") do |f|
-        # FIXME: path to pjs2png.js.erb
-        # FIXME: path to processing.js
-        f.print Tilt.new((Rails.root + "pjs2png.js.erb").to_s).render(nil, :pjs => data.inspect, :processingjs => File.read(Rails.root + "processing-1.1.0.min.js").inspect)
+        f.print Tilt.new(PhantomJs.pjs2png_path).render(nil, :pjs => data.inspect, :processingjs => File.read(ProcessingJs.path).inspect)
         f.flush
-        cmd = "#{phantomjs} #{f.path}"
+        cmd = "#{PhantomJs.path} #{f.path}"
         `#{cmd}`
       end
       require "base64"
@@ -23,7 +35,7 @@ module Baren
     end
   end
   #Tilt.register Baren::PjsTemplate, "pjs"
-  
+
   # workaround for the problem about Sprockets::DirectiveProcessor parsing binary (png)
   class PossibleBinaryDirectiveProcessor < Sprockets::DirectiveProcessor
     def prepare

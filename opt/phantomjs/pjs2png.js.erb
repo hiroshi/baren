@@ -1,0 +1,9 @@
+if (phantom.state.length === 0) {
+  phantom.state = 1;
+  phantom.content = '<html><body><script>' + <%= processingjs %> + '</script><canvas id="surface"></canvas></body></html>';
+} else {
+  var canvas = document.getElementById("surface");
+  new Processing(canvas, <%= pjs %>);
+  console.log(canvas.toDataURL());
+  phantom.exit();
+}
