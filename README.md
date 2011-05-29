@@ -8,7 +8,7 @@ Baren generate .png images form .pjs ([Processing.js](http://processingjs.org/) 
 
 Usages
 ------
-=== With Rails 3.1 Asset pipeline
+### With Rails 3.1 Asset pipeline
 Add the line below in Gemfile of your Rails 3.1 app.
 
     gem "baren"
