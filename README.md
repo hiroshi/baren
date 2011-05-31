@@ -6,6 +6,23 @@ Baren generate .png images form .pjs ([Processing.js](http://processingjs.org/) 
 - Can be a part of the asset pipeline of Rails 3.1
 
 
+Prerequisites
+-------------
+Baren requires PhantomJS as the Javascript and Canvas engine, 
+and PhantomJS requires QtWebKit.
+
+### Mac OS X
+Baren use a binary package of PhantomJS for Mac OS X, so there is no need to do before installing baren.
+
+### Ubuntu 10.04
+    sudo apt-get install libqt4-dev qt4-qmake
+
+For other linux distributions, please consult with [BuildInstructions - phantomjs](http://code.google.com/p/phantomjs/wiki/BuildInstructions).
+
+### Windows
+TBD
+
+
 Usages
 ------
 ### With Rails 3.1 Asset pipeline
