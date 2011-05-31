@@ -39,7 +39,7 @@ when /linux/
   end
 
   file phantomjs[:buildbin] => [phantomjs[:archive], phantomjs[:builddir]] do |t|
-    sh "(cd #{phantomjs[:builddir]} && tar xzf ../#{phantomjs[:archive]} && qmake-qt4 && make)"
+    sh "(cd #{phantomjs[:builddir]} && tar xzf ../#{File.basename(phantomjs[:archive])} && qmake-qt4 && make)"
   end
 
   directory phantomjs[:builddir]
