@@ -1,3 +1,4 @@
+# -*- ruby -*-
 # PhantomJS
 case RUBY_PLATFORM 
 when /darwin/
