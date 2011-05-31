@@ -27,7 +27,12 @@ module Baren
       dataURL = Tempfile.open("pjs2png") do |f|
         f.print Tilt.new(PhantomJs.pjs2png_path).render(nil, :pjs => data.inspect, :processingjs => File.read(ProcessingJs.path).inspect)
         f.flush
-        cmd = "#{PhantomJs.path} #{f.path}"
+        case RUBY_PLATFORM
+        when /linux/
+          cmd = "xvfb-run #{PhantomJs.path} #{f.path}"
+        else
+          cmd = "#{PhantomJs.path} #{f.path}"
+        end
         `#{cmd}`
       end
       require "base64"

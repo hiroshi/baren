@@ -1,21 +1,22 @@
 # -*- ruby -*-
 # PhantomJS
+phantomjs = {
+  :target => "phantomjs/bin/phantomjs",
+  :bindir => "phantomjs/bin",
+}
+
 case RUBY_PLATFORM 
 when /darwin/
-  phantomjs = {
-    :bindir => "phantomjs/bin",
-    :target => "phantomjs/bin/phantomjs",
+  phantomjs.update({
     :url => "http://phantomjs.googlecode.com/files/phantomjs-1.1.0-macosx-universal.dmg",
     :archive => "phantomjs/phantomjs-1.1.0-macosx-universal.dmg",
     :app    => "phantomjs/phantomjs.app",
     :volume  => "/Volumes/phantomjs",
-  }
-  
-  file phantomjs[:target] => [phantomjs[:app], File.dirname(phantomjs[:target])] do |t|
+  })
+
+  file phantomjs[:target] => [phantomjs[:app]] do |t|
     sh "(cd #{t.prerequisites[1]} && ln -s ../#{File.basename(t.prerequisites[0])}/Contents/MacOS/phantomjs phantomjs)"
   end
-
-  directory File.dirname(phantomjs[:target])
 
   file phantomjs[:app] => [phantomjs[:archive]] do |t|
     sh "hdiutil attach #{t.prerequisites[0]}"
@@ -25,14 +26,35 @@ when /darwin/
       sh "hdiutil detach #{phantomjs[:volume]}"
     end
   end
-  
-  file phantomjs[:archive] do |t|
-    sh "(cd phantomjs && curl -O #{phantomjs[:url]})"
+when /linux/
+  phantomjs.update({
+    :url => "http://phantomjs.googlecode.com/files/phantomjs-1.1.0-source.tar.gz",
+    :archive => "phantomjs/phantomjs-1.1.0-source.tar.gz",
+    :builddir => "phantomjs/phantomjs-1.1.0-source",
+    :buildbin => "phantomjs/phantomjs-1.1.0-source/bin/phantomjs",
+  })
+
+  file phantomjs[:target] => [phantomjs[:buildbin]] do |t|
+    sh "(cd #{phantomjs[:bindir]} && ln -s ../../#{phantomjs[:buildbin]} phantomjs)"
   end
+
+  file phantomjs[:buildbin] => [phantomjs[:archive], phantomjs[:builddir]] do |t|
+    sh "(cd #{phantomjs[:builddir]} && tar xzf ../#{phantomjs[:archive]} && qmake-qt4 && make)"
+  end
+
+  directory phantomjs[:builddir]
 else
   # http://code.google.com/p/phantomjs/downloads/list
   # http://code.google.com/p/phantomjs/wiki/Installation
   abort "Your RUBY_PLATFORM (#{RUBY_PLATFORM}) is not supported yet. See http://code.google.com/p/phantomjs/wiki/Installation and help us."
+end
+
+file phantomjs[:target] => File.dirname(phantomjs[:target])
+
+directory File.dirname(phantomjs[:target])
+
+file phantomjs[:archive] do |t|
+  sh "(cd phantomjs && curl -O #{phantomjs[:url]})"
 end
 
 

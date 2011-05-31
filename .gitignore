@@ -1,3 +1,5 @@
 opt/phantomjs/bin
 opt/phantomjs/*.dmg
 opt/phantomjs/*.app
+opt/phantomjs/phantomjs-*-source*
+vendor/

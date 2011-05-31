@@ -15,7 +15,8 @@ and PhantomJS requires QtWebKit.
 Baren use a binary package of PhantomJS for Mac OS X, so there is no need to do before installing baren.
 
 ### Ubuntu 10.04
-    sudo apt-get install libqt4-dev qt4-qmake
+
+    sudo apt-get install curl libqt4-dev qt4-qmake xvfb
 
 For other linux distributions, please consult with [BuildInstructions - phantomjs](http://code.google.com/p/phantomjs/wiki/BuildInstructions).
 
@@ -43,14 +44,6 @@ This is an example of processing.js script:
 
 Access http://localhost:3000/assets/reddisc.png (tweak URL for your environment).
 You will see a red circle, and please enjoy with [processing.js API reference](http://processingjs.org/reference).
-
-
-Caveats
--------
-Baren requires PhantomJS as the Javascript and Canvas engine,
-but current version of baren gem only install mac version of PhantomJS.
-If you use other platform, place a binary of phantomjs on {path to baren gem}/opt/phantomjs/bin/phantomjs.
-I'll support Linux and Windows soon after.
 
 
 Developer Notes
