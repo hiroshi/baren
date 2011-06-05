@@ -1,5 +1,4 @@
 require "tilt"
-require "sprockets"
 module Baren
   class ProcessingJs
     def self.path
@@ -41,29 +40,32 @@ module Baren
   end
   #Tilt.register Baren::PjsTemplate, "pjs"
 
-  # workaround for the problem about Sprockets::DirectiveProcessor parsing binary (png)
-  class PossibleBinaryDirectiveProcessor < Sprockets::DirectiveProcessor
-    def prepare
-      if !data.respond_to?(:valid_encoding?) || data.valid_encoding?
-        super
+  if defined?(::Rails::Railtie)
+    require "sprockets"
+    # workaround for the problem about Sprockets::DirectiveProcessor parsing binary (png)
+    class PossibleBinaryDirectiveProcessor < Sprockets::DirectiveProcessor
+      def prepare
+        if !data.respond_to?(:valid_encoding?) || data.valid_encoding?
+          super
+        end
+      end
+
+      def evaluate(context, locals, &block)
+        if @directive_parser
+          super
+        else
+          data
+        end
       end
     end
 
-    def evaluate(context, locals, &block)
-      if @directive_parser
-        super
-      else
-        data
-      end
-    end
-  end
-
-  class Railtie < Rails::Railtie
-    config.after_initialize do |app|
-      app.assets.instance_eval do
-        register_mime_type 'image/png', '.png'
-        register_engine '.pjs', Baren::PjsTemplate
-        register_processor 'image/png', Baren::PossibleBinaryDirectiveProcessor #Sprockets::DirectiveProcessor
+    class Railtie < ::Rails::Railtie
+      config.after_initialize do |app|
+        app.assets.instance_eval do
+          register_mime_type 'image/png', '.png'
+          register_engine '.pjs', Baren::PjsTemplate
+          register_processor 'image/png', Baren::PossibleBinaryDirectiveProcessor #Sprockets::DirectiveProcessor
+        end
       end
     end
   end
