@@ -1,5 +1,8 @@
 require "tilt"
 module Baren
+  class Error < Exception; end
+  class ProcessingJsError < Error; end
+
   class ProcessingJs
     def self.path
       File.join(File.dirname(__FILE__), '..', 'vendor', 'assets', 'javascripts', 'processing.min.js')
@@ -34,8 +37,12 @@ module Baren
         end
         `#{cmd}`
       end
-      require "base64"
-      @output ||= Base64.decode64(dataURL[%r"data:image/png;base64,(.*)",1])
+      if encodedImage = dataURL[%r"data:image/png;base64,(.*)",1]
+        require "base64"
+        @output ||= Base64.decode64(encodedImage)
+      else
+        raise Baren::ProcessingJsError, dataURL
+      end
     end
   end
   #Tilt.register Baren::PjsTemplate, "pjs"
