@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'baren'
-  s.version     = '0.2.1'
+  s.version     = '0.2.2'
   s.summary     = "Generate .png form .pjs, processing.js script."
   s.description = "An asset pipeline processor, and a template engine for images."
   s.authors     = ["Hiroshi Saito"]
